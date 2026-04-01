@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ICE CREAM ADVENTURE — DJ · ICA</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --cream:  #F5ECD7;
+  --pink:   #F2A7B8;
+  --mint:   #90CDB8;
+  --gold:   #E8C87A;
+  --deep:   #100C14;
+  --plum:   #1E1028;
+  --purple: #2A1640;
+  --text:   #F5ECD7;
+  --dim:    rgba(245,236,215,0.45);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin:0; padding:0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--deep);
+  color: var(--text);
+  font-family: 'DM Mono', monospace;
+  overflow-x: hidden;
+  cursor: none;
+}
+
+/* CURSOR */
+#cursor      { width:12px; height:12px; background:var(--pink); border-radius:50%; position:fixed; pointer-events:none; z-index:9999; transform:translate(-50%,-50%); mix-blend-mode:difference; }
+#cursor-ring { width:36px; height:36px; border:1px solid rgba(245,236,215,.5); border-radius:50%; position:fixed; pointer-events:none; z-index:9998; transform:translate(-50%,-50%); transition:all .18s ease; }
+
+/* GRAIN */
+body::after {
+  content:''; position:fixed; inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='.05'/%3E%3C/svg%3E");
+  pointer-events:none; z-index:9000; opacity:.4;
+}
+
+/* NAV */
+nav {
+  position:fixed; top:0; left:0; right:0; z-index:500;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:1.2rem 3.5rem;
+  background:linear-gradient(to bottom, rgba(16,12,20,.92) 0%, transparent 100%);
+  backdrop-filter:blur(2px);
+}
+.nav-logo { font-family:'Bebas Neue',sans-serif; font-size:1.6rem; letter-spacing:.15em; color:var(--pink); text-decoration:none; }
+.nav-links { display:flex; gap:2.5rem; list-style:none; }
+.nav-links a { text-decoration:none; color:var(--cream); font-size:.65rem; letter-spacing:.2em; text-transform:uppercase; opacity:.6; transition:opacity .2s,color .2s; cursor:none; }
+.nav-links a:hover { opacity:1; color:var(--mint); }
+.nav-book { background:var(--pink); color:var(--deep); padding:.55rem 1.6rem; border:none; font-family:'DM Mono',monospace; font-size:.65rem; letter-spacing:.18em; text-transform:uppercase; cursor:none; transition:background .2s,transform .15s; text-decoration:none; display:inline-block; }
+.nav-book:hover { background:var(--gold); transform:translateY(-1px); }
+
+/* HERO */
+#hero { min-height:100vh; position:relative; overflow:hidden; display:flex; flex-direction:column; justify-content:center; }
+.hero-bg {
+  position:absolute; inset:0; z-index:0;
+  background:
+    radial-gradient(ellipse 55% 60% at 75% 55%, rgba(242,167,184,.14) 0%, transparent 65%),
+    radial-gradient(ellipse 45% 55% at 15% 40%, rgba(144,205,184,.09) 0%, transparent 60%),
+    radial-gradient(ellipse 30% 40% at 50% 20%, rgba(232,200,122,.06) 0%, transparent 55%),
+    linear-gradient(155deg, #100C14 0%, #1E1028 50%, #100C14 100%);
+}
+
+.vinyl-wrap { position:absolute; right:-80px; top:50%; transform:translateY(-50%); width:560px; height:560px; z-index:1; opacity:.5; }
+.vinyl { width:100%; height:100%; border-radius:50%; background: repeating-radial-gradient(circle at 50% 50%, #18101E 0px, #18101E 2px, #241830 2px, #241830 4px); animation:spin 5s linear infinite; box-shadow:inset 0 0 40px rgba(0,0,0,.8), 0 0 120px rgba(16,12,20,.9); position:relative; }
+.vinyl-label { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:130px; height:130px; border-radius:50%; background:radial-gradient(circle, var(--pink) 0%, #b06070 60%, #7a3545 100%); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:.2rem; }
+.vinyl-label span { font-family:'Bebas Neue',sans-serif; font-size:.7rem; letter-spacing:.15em; color:rgba(255,255,255,.8); }
+@keyframes spin { to { transform:rotate(360deg); } }
+
+.hero-content { position:relative; z-index:2; padding:9rem 3.5rem 4rem; max-width:720px; }
+.hero-eyebrow { font-size:.6rem; letter-spacing:.38em; text-transform:uppercase; color:var(--mint); margin-bottom:1.4rem; opacity:0; animation:riseIn .8s ease .2s forwards; }
+.hero-name { font-family:'Bebas Neue',sans-serif; font-size:clamp(5rem,12vw,10rem); line-height:.88; letter-spacing:.04em; color:var(--cream); opacity:0; animation:riseIn .9s ease .4s forwards; }
+.hero-name em { color:var(--pink); font-style:normal; display:block; }
+.hero-sub { margin-top:1.8rem; font-size:.78rem; letter-spacing:.05em; line-height:1.8; color:var(--dim); max-width:460px; opacity:0; animation:riseIn .9s ease .65s forwards; }
+.hero-ctas { margin-top:2.5rem; display:flex; gap:1rem; flex-wrap:wrap; opacity:0; animation:riseIn .9s ease .9s forwards; }
+
+.btn-pink { background:var(--pink); color:var(--deep); padding:.85rem 2.4rem; border:none; font-family:'DM Mono',monospace; font-size:.7rem; letter-spacing:.16em; text-transform:uppercase; cursor:none; transition:background .2s,transform .15s; text-decoration:none; display:inline-block; }
+.btn-pink:hover { background:var(--gold); transform:translateY(-2px); }
+.btn-ghost { background:transparent; color:var(--cream); padding:.85rem 2.4rem; border:1px solid rgba(245,236,215,.25); font-family:'DM Mono',monospace; font-size:.7rem; letter-spacing:.16em; text-transform:uppercase; cursor:none; transition:border-color .2s,color .2s,transform .15s; text-decoration:none; display:inline-block; }
+.btn-ghost:hover { border-color:var(--mint); color:var(--mint); transform:translateY(-2px); }
+
+.hero-stats { position:relative; z-index:2; display:flex; gap:3.5rem; padding:3rem 3.5rem; border-top:1px solid rgba(245,236,215,.07); opacity:0; animation:riseIn .9s ease 1.1s forwards; }
+.stat-num { font-family:'Bebas Neue',sans-serif; font-size:2.5rem; letter-spacing:.05em; color:var(--cream); line-height:1; }
+.stat-label { font-size:.6rem; letter-spacing:.2em; text-transform:uppercase; color:var(--dim); margin-top:.3rem; }
+
+@keyframes riseIn { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
+
+/* SECTIONS */
+section { padding:7rem 3.5rem; }
+.section-tag { font-size:.58rem; letter-spacing:.35em; text-transform:uppercase; color:var(--mint); margin-bottom:.8rem; }
+.section-heading { font-family:'Bebas Neue',sans-serif; font-size:clamp(3rem,6vw,5rem); letter-spacing:.05em; line-height:1; color:var(--cream); margin-bottom:3rem; }
+.divider { width:50px; height:2px; background:linear-gradient(to right, var(--pink), transparent); margin:1rem 0 2.5rem; }
+
+/* ABOUT */
+#about { background:var(--plum); display:grid; grid-template-columns:1fr 1fr; gap:5rem; align-items:center; }
+.about-photo-frame { aspect-ratio:3/4; background:linear-gradient(145deg, var(--purple) 0%, var(--plum) 100%); border:1px solid rgba(242,167,184,.2); position:relative; overflow:hidden; display:flex; align-items:center; justify-content:center; }
+.about-photo-frame::before { content:''; position:absolute; inset:0; background: radial-gradient(ellipse 80% 60% at 50% 30%, rgba(242,167,184,.18) 0%, transparent 70%), radial-gradient(ellipse 60% 80% at 70% 80%, rgba(144,205,184,.12) 0%, transparent 60%); }
+.photo-placeholder { font-family:'Bebas Neue',sans-serif; font-size:5rem; color:rgba(242,167,184,.3); letter-spacing:.1em; position:relative; z-index:1; text-align:center; line-height:1.1; }
+.about-accent { position:absolute; bottom:-1px; right:-1px; width:60%; height:3px; background:linear-gradient(to right, transparent, var(--pink)); }
+.about-text p { font-size:.82rem; line-height:1.95; color:rgba(245,236,215,.7); margin-bottom:1.4rem; }
+.about-text p strong { color:var(--cream); font-weight:500; }
+.about-tags { display:flex; flex-wrap:wrap; gap:.6rem; margin-top:2rem; }
+.tag { font-size:.6rem; letter-spacing:.18em; text-transform:uppercase; padding:.4rem 1rem; border:1px solid rgba(144,205,184,.3); color:var(--mint); }
+
+/* SETS */
+#sets { background:var(--deep); }
+.sets-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(360px, 1fr)); gap:1.5rem; }
+.set-card { background:rgba(30,16,40,.6); border:1px solid rgba(245,236,215,.07); transition:border-color .25s,transform .25s; overflow:hidden; }
+.set-card:hover { border-color:rgba(242,167,184,.3); transform:translateY(-3px); }
+.set-card-header { padding:1.2rem 1.4rem .6rem; }
+.set-title { font-family:'Bebas Neue',sans-serif; font-size:1.2rem; letter-spacing:.06em; color:var(--cream); line-height:1.1; }
+.set-genre { font-size:.58rem; letter-spacing:.2em; text-transform:uppercase; color:var(--pink); margin-top:.3rem; }
+.set-embed { display:block; width:100%; }
+.set-embed iframe { display:block; width:100%; border:none; }
+.mixcloud-link { display:flex; align-items:center; gap:.6rem; padding:.8rem 1.4rem; font-size:.62rem; letter-spacing:.15em; text-transform:uppercase; color:var(--dim); text-decoration:none; border-top:1px solid rgba(245,236,215,.05); transition:color .2s; cursor:none; }
+.mixcloud-link:hover { color:var(--mint); }
+.mixcloud-link svg { width:14px; height:14px; fill:currentColor; flex-shrink:0; }
+
+/* SHOWS */
+#shows { background:var(--plum); }
+.shows-list { display:flex; flex-direction:column; }
+.show-row { display:grid; grid-template-columns:80px 1fr auto; align-items:center; gap:2rem; padding:1.6rem 0; border-bottom:1px solid rgba(245,236,215,.07); transition:background .2s; }
+.show-row:first-child { border-top:1px solid rgba(245,236,215,.07); }
+.show-row:hover { background:rgba(242,167,184,.04); }
+.show-date { font-family:'Bebas Neue',sans-serif; font-size:1.4rem; letter-spacing:.05em; color:var(--pink); line-height:1; text-align:center; }
+.show-date span { display:block; font-family:'DM Mono',monospace; font-size:.58rem; letter-spacing:.2em; color:var(--dim); }
+.show-name { font-size:.85rem; letter-spacing:.05em; color:var(--cream); }
+.show-venue { font-size:.65rem; letter-spacing:.1em; color:var(--dim); margin-top:.25rem; }
+.show-badge { font-size:.55rem; letter-spacing:.18em; text-transform:uppercase; padding:.3rem .8rem; border:1px solid; white-space:nowrap; }
+.show-badge.past { color:var(--dim); border-color:rgba(245,236,215,.15); }
+.show-badge.upcoming { color:var(--mint); border-color:rgba(144,205,184,.4); }
+
+/* BOOKING */
+#booking { background:var(--deep); position:relative; overflow:hidden; }
+#booking::before { content:''; position:absolute; inset:0; background: radial-gradient(ellipse 60% 70% at 80% 50%, rgba(242,167,184,.1) 0%, transparent 65%), radial-gradient(ellipse 40% 50% at 10% 60%, rgba(144,205,184,.08) 0%, transparent 55%); pointer-events:none; }
+.booking-inner { position:relative; z-index:1; max-width:680px; }
+.booking-inner > p { font-size:.82rem; line-height:1.9; color:rgba(245,236,215,.65); max-width:500px; margin-bottom:2.5rem; }
+.contact-options { display:flex; flex-wrap:wrap; gap:1rem; margin-bottom:3rem; }
+.contact-card { background:rgba(30,16,40,.5); border:1px solid rgba(245,236,215,.1); padding:1.4rem 2rem; min-width:180px; flex:1; transition:border-color .25s,transform .2s; text-decoration:none; display:block; cursor:none; }
+.contact-card:hover { border-color:rgba(242,167,184,.4); transform:translateY(-2px); }
+.contact-card-label { font-size:.58rem; letter-spacing:.25em; text-transform:uppercase; color:var(--mint); margin-bottom:.5rem; }
+.contact-card-value { font-size:.78rem; color:var(--cream); word-break:break-all; }
+
+.booking-form { display:flex; flex-direction:column; gap:1rem; max-width:560px; }
+.form-row { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+.form-group { display:flex; flex-direction:column; gap:.4rem; }
+.form-group label { font-size:.58rem; letter-spacing:.22em; text-transform:uppercase; color:var(--dim); }
+.form-group input, .form-group textarea, .form-group select { background:rgba(30,16,40,.6); border:1px solid rgba(245,236,215,.12); color:var(--cream); font-family:'DM Mono',monospace; font-size:.75rem; padding:.8rem 1rem; outline:none; transition:border-color .2s; -webkit-appearance:none; appearance:none; cursor:none; }
+.form-group input:focus, .form-group textarea:focus, .form-group select:focus { border-color:var(--pink); }
+.form-group textarea { resize:vertical; min-height:100px; }
+.form-submit { background:var(--pink); color:var(--deep); border:none; font-family:'DM Mono',monospace; font-size:.72rem; letter-spacing:.18em; text-transform:uppercase; padding:1rem 2.5rem; cursor:none; transition:background .2s,transform .15s; align-self:flex-start; margin-top:.5rem; }
+.form-submit:hover { background:var(--gold); transform:translateY(-2px); }
+.form-success { display:none; padding:1.5rem; background:rgba(144,205,184,.1); border:1px solid rgba(144,205,184,.3); margin-top:1rem; font-size:.75rem; letter-spacing:.08em; color:var(--mint); }
+
+/* FOOTER */
+footer { background:var(--plum); padding:3rem 3.5rem; display:flex; align-items:center; justify-content:space-between; border-top:1px solid rgba(245,236,215,.07); flex-wrap:wrap; gap:1.5rem; }
+.footer-logo { font-family:'Bebas Neue',sans-serif; font-size:1.8rem; letter-spacing:.12em; color:var(--pink); }
+.footer-copy { font-size:.6rem; letter-spacing:.12em; color:var(--dim); }
+.footer-social { display:flex; gap:1.4rem; }
+.footer-social a { font-size:.6rem; letter-spacing:.18em; text-transform:uppercase; color:var(--dim); text-decoration:none; transition:color .2s; cursor:none; }
+.footer-social a:hover { color:var(--cream); }
+
+/* REVEAL */
+.reveal { opacity:0; transform:translateY(30px); transition:opacity .7s ease, transform .7s ease; }
+.reveal.visible { opacity:1; transform:translateY(0); }
+
+/* RESPONSIVE */
+@media(max-width:900px) {
+  nav { padding:1.2rem 1.5rem; }
+  .nav-links { display:none; }
+  section { padding:5rem 1.5rem; }
+  #about { grid-template-columns:1fr; gap:3rem; }
+  .sets-grid { grid-template-columns:1fr; }
+  .show-row { grid-template-columns:60px 1fr; }
+  .show-badge { display:none; }
+  .form-row { grid-template-columns:1fr; }
+  footer { flex-direction:column; gap:1rem; }
+  .hero-stats { gap:2rem; flex-wrap:wrap; }
+  .vinyl-wrap { opacity:.2; right:-120px; width:400px; height:400px; }
+}
+</style>
+</head>
+<body>
+
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="#hero" class="nav-logo">ICA</a>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#sets">Sets</a></li>
+    <li><a href="#shows">Shows</a></li>
+    <li><a href="#booking">Contact</a></li>
+  </ul>
+  <a href="#booking" class="nav-book">Book ICA</a>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="vinyl-wrap">
+    <div class="vinyl">
+      <div class="vinyl-label">
+        <span>ICA</span>
+        <span>●</span>
+      </div>
+    </div>
+  </div>
+  <div class="hero-content">
+    <p class="hero-eyebrow">Salinas · California · House Music</p>
+    <h1 class="hero-name">Ice<em>Cream</em>Adventure</h1>
+    <p class="hero-sub">
+      On a most excellent adventure to create and innovate. West Coast house sounds, 
+      sun-soaked grooves, and infectious beats — spinning everywhere from Monterey to wherever the music takes her. ✨
+    </p>
+    <div class="hero-ctas">
+      <a href="#booking" class="btn-pink">Book ICA</a>
+      <a href="#sets" class="btn-ghost">Listen to Sets</a>
+    </div>
+  </div>
+  <div class="hero-stats">
+    <div><div class="stat-num">🍦</div><div class="stat-label">West Coast Flavor</div></div>
+    <div><div class="stat-num">CA</div><div class="stat-label">Based in Salinas</div></div>
+    <div><div class="stat-num">∞</div><div class="stat-label">Good Vibes</div></div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="reveal">
+    <div class="about-photo-frame">
+      <div class="photo-placeholder">ICA</div>
+      <div class="about-accent"></div>
+    </div>
+  </div>
+  <div class="about-text reveal">
+    <p class="section-tag">About the DJ</p>
+    <h2 class="section-heading">Diana<br/>Perez</h2>
+    <div class="divider"></div>
+    <p>Born and raised amidst the <strong>sunny vibes of California</strong>, ICA — Ice Cream Adventure — has honed her craft to perfection, infusing her sets with infectious beats and a touch of West Coast flavor.</p>
+    <p>Whether she's spinning in cozy Salinas venues or holding it down at <strong>Monterey First Sundays</strong> for house enthusiasts, ICA brings an energy that's equal parts warm, adventurous, and undeniably groovy.</p>
+    <p>Her mission: <em>"On a most excellent adventure to create and innovate within my realm of creation."</em> Find her sets on Mixcloud, her journey on Instagram, and her bookings in your inbox. ✨</p>
+    <div class="about-tags">
+      <span class="tag">House</span>
+      <span class="tag">Deep House</span>
+      <span class="tag">Electronic</span>
+      <span class="tag">West Coast</span>
+      <span class="tag">Live Sets</span>
+      <span class="tag">Cali Vibes</span>
+    </div>
+  </div>
+</section>
+
+<!-- SETS / MIXCLOUD -->
+<section id="sets">
+  <p class="section-tag reveal">Listen</p>
+  <h2 class="section-heading reveal">Sets &amp; Mixes</h2>
+
+  <div class="sets-grid">
+    <div class="set-card reveal">
+      <div class="set-card-header">
+        <div class="set-title">Latest Upload</div>
+        <div class="set-genre">House · Deep · Electronic</div>
+      </div>
+      <div class="set-embed">
+        <iframe height="120"
+          src="https://www.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&feed=%2Ficecreamadventure%2F&autoplay=0&dark=1"
+          allow="autoplay"></iframe>
+      </div>
+      <a href="https://www.mixcloud.com/icecreamadventure/" target="_blank" class="mixcloud-link">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M11.56 8.87V17h4.43v-1.77h-2.64V8.87zm-3.95 0v6.36H5.18V8.87H3.37V17h5.95V8.87zM20.15 8.87l-1.32 4.67-1.31-4.67H15.7l2.08 6.02c.14.35.14.72 0 1.07l-.26.62c-.18.36-.43.54-.8.54l-.6-.06v1.7l.79.07c1.28 0 2.04-.7 2.54-2.12L22 8.87z"/></svg>
+        Open on Mixcloud
+      </a>
+    </div>
+
+    <div class="set-card reveal">
+      <div class="set-card-header">
+        <div class="set-title">House Sessions</div>
+        <div class="set-genre">Afro House · Melodic</div>
+      </div>
+      <div class="set-embed">
+        <iframe height="120"
+          src="https://www.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&feed=%2Ficecreamadventure%2Fplaylists%2F&autoplay=0&dark=1"
+          allow="autoplay"></iframe>
+      </div>
+      <a href="https://www.mixcloud.com/icecreamadventure/" target="_blank" class="mixcloud-link">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M11.56 8.87V17h4.43v-1.77h-2.64V8.87zm-3.95 0v6.36H5.18V8.87H3.37V17h5.95V8.87zM20.15 8.87l-1.32 4.67-1.31-4.67H15.7l2.08 6.02c.14.35.14.72 0 1.07l-.26.62c-.18.36-.43.54-.8.54l-.6-.06v1.7l.79.07c1.28 0 2.04-.7 2.54-2.12L22 8.87z"/></svg>
+        Browse Playlists
+      </a>
+    </div>
+
+    <div class="set-card reveal" style="grid-column:1/-1;">
+      <div class="set-card-header">
+        <div class="set-title">Full Profile — Browse All Sets</div>
+        <div class="set-genre">Complete Mixcloud Archive</div>
+      </div>
+      <div class="set-embed">
+        <iframe height="200"
+          src="https://www.mixcloud.com/widget/iframe/?hide_cover=1&feed=%2Ficecreamadventure%2F&autoplay=0&dark=1"
+          allow="autoplay"></iframe>
+      </div>
+      <a href="https://www.mixcloud.com/icecreamadventure/" target="_blank" class="mixcloud-link">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M11.56 8.87V17h4.43v-1.77h-2.64V8.87zm-3.95 0v6.36H5.18V8.87H3.37V17h5.95V8.87zM20.15 8.87l-1.32 4.67-1.31-4.67H15.7l2.08 6.02c.14.35.14.72 0 1.07l-.26.62c-.18.36-.43.54-.8.54l-.6-.06v1.7l.79.07c1.28 0 2.04-.7 2.54-2.12L22 8.87z"/></svg>
+        View All Sets on Mixcloud →
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- PAST SHOWS -->
+<section id="shows">
+  <p class="section-tag reveal">On Stage</p>
+  <h2 class="section-heading reveal">Past &amp; Upcoming Shows</h2>
+
+  <div class="shows-list">
+    <div class="show-row reveal">
+      <div class="show-date">TBD<span>2025</span></div>
+      <div>
+        <div class="show-name">Monterey First Sundays</div>
+        <div class="show-venue">Monterey, CA — House Enthusiasts Showcase</div>
+      </div>
+      <span class="show-badge upcoming">Upcoming</span>
+    </div>
+    <div class="show-row reveal">
+      <div class="show-date">SEP<span>2024</span></div>
+      <div>
+        <div class="show-name">Monterey First Sundays</div>
+        <div class="show-venue">Monterey, CA — Monthly House Night</div>
+      </div>
+      <span class="show-badge past">Past</span>
+    </div>
+    <div class="show-row reveal">
+      <div class="show-date">SUM<span>2024</span></div>
+      <div>
+        <div class="show-name">Local Venue Set</div>
+        <div class="show-venue">Salinas, CA</div>
+      </div>
+      <span class="show-badge past">Past</span>
+    </div>
+    <div class="show-row reveal">
+      <div class="show-date">2023</div>
+      <div>
+        <div class="show-name">Golden Eagle Radio</div>
+        <div class="show-venue">Cal State LA — Campus Broadcast</div>
+      </div>
+      <span class="show-badge past">Past</span>
+    </div>
+    <div class="show-row reveal">
+      <div class="show-date">· · ·</div>
+      <div>
+        <div class="show-name">More Dates TBA</div>
+        <div class="show-venue">Follow @icecreamadventure for announcements</div>
+      </div>
+      <span class="show-badge upcoming">Stay Tuned</span>
+    </div>
+  </div>
+</section>
+
+<!-- BOOKING -->
+<section id="booking">
+  <div class="booking-inner">
+    <p class="section-tag reveal">Get in Touch</p>
+    <h2 class="section-heading reveal">Book ICA</h2>
+    <div class="divider reveal"></div>
+    <p class="reveal">Ready to bring West Coast house vibes to your event? ICA is available for club nights, private events, pop-ups, festivals, and everything in between. Reach out — let's make something excellent together. ✨</p>
+
+    <div class="contact-options reveal">
+      <a href="mailto:icecreambookings@gmail.com" class="contact-card">
+        <div class="contact-card-label">Email Bookings</div>
+        <div class="contact-card-value">icecreambookings@gmail.com</div>
+      </a>
+      <a href="https://www.instagram.com/icecreamadventure" target="_blank" class="contact-card">
+        <div class="contact-card-label">Instagram DM</div>
+        <div class="contact-card-value">@icecreamadventure</div>
+      </a>
+      <a href="https://www.mixcloud.com/icecreamadventure/" target="_blank" class="contact-card">
+        <div class="contact-card-label">Mixcloud</div>
+        <div class="contact-card-value">mixcloud.com/icecreamadventure</div>
+      </a>
+    </div>
+
+    <form class="booking-form reveal" id="bookingForm">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Your Name</label>
+          <input type="text" placeholder="Jane Smith" required />
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" placeholder="jane@example.com" required />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Event Type</label>
+          <select>
+            <option value="">— Select —</option>
+            <option>Club Night</option>
+            <option>Private Party</option>
+            <option>Festival</option>
+            <option>Pop-up / Market</option>
+            <option>Radio / Podcast</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Event Date</label>
+          <input type="date" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Venue / Location</label>
+        <input type="text" placeholder="Venue name, City, State" />
+      </div>
+      <div class="form-group">
+        <label>Tell ICA about your event</label>
+        <textarea placeholder="Expected attendance, vibe, set length, any special requests…"></textarea>
+      </div>
+      <button type="submit" class="form-submit">Send Inquiry</button>
+      <div class="form-success" id="formSuccess">
+        ✦ Message sent! ICA will be in touch soon. Stay excellent. 🍦
+      </div>
+    </form>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">ICA</div>
+  <div class="footer-copy">© 2025 Ice Cream Adventure · Salinas, CA</div>
+  <div class="footer-social">
+    <a href="https://www.instagram.com/icecreamadventure" target="_blank">Instagram</a>
+    <a href="https://www.mixcloud.com/icecreamadventure/" target="_blank">Mixcloud</a>
+    <a href="mailto:icecreambookings@gmail.com">Email</a>
+  </div>
+</footer>
+
+<script>
+// Custom cursor
+const cursor = document.getElementById('cursor');
+const ring = document.getElementById('cursor-ring');
+let mx = 0, my = 0, rx = 0, ry = 0;
+document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+(function animateCursor() {
+  cursor.style.left = mx + 'px'; cursor.style.top = my + 'px';
+  rx += (mx - rx) * .12; ry += (my - ry) * .12;
+  ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+  requestAnimationFrame(animateCursor);
+})();
+document.querySelectorAll('a,button').forEach(el => {
+  el.addEventListener('mouseenter', () => { ring.style.transform = 'translate(-50%,-50%) scale(1.7)'; ring.style.borderColor = 'var(--pink)'; });
+  el.addEventListener('mouseleave', () => { ring.style.transform = 'translate(-50%,-50%) scale(1)'; ring.style.borderColor = 'rgba(245,236,215,.5)'; });
+});
+
+// Scroll reveal with stagger
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (!e.isIntersecting) return;
+    const siblings = [...e.target.parentElement.querySelectorAll('.reveal:not(.visible)')];
+    const idx = siblings.indexOf(e.target);
+    setTimeout(() => e.target.classList.add('visible'), Math.max(0, idx) * 90);
+    obs.unobserve(e.target);
+  });
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(r => obs.observe(r));
+
+// Booking form
+document.getElementById('bookingForm').addEventListener('submit', e => {
+  e.preventDefault();
+  document.getElementById('formSuccess').style.display = 'block';
+  e.target.querySelectorAll('input,textarea,select,button').forEach(el => el.disabled = true);
+});
+</script>
+</body>
+</html>
